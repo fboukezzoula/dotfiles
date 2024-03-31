@@ -4,6 +4,10 @@ install_on_fedora() {
     sudo dnf install -y ansible
 }
 
+install_on_rhel() {
+    sudo dnf install -y ansible
+}
+
 install_on_ubuntu() {
     sudo apt-get update
     sudo apt-get install -y ansible
@@ -18,6 +22,9 @@ case "${OS}" in
     Linux*)
         if [ -f /etc/fedora-release ]; then
             install_on_fedora
+        elif [ -f /etc/os-release ]; then
+            install_on_rhel
+        else            
         elif [ -f /etc/lsb-release ]; then
             install_on_ubuntu
         else
