@@ -16,8 +16,9 @@ alias v=nvim
 alias k=kubectl
 alias fly=flyctl
 
+# https://bun.sh/ 
 # bun completions
-[ -s "/home/ldonley/.bun/_bun" ] && source "/home/ldonley/.bun/_bun"
+[ -s "/home/fboukezzoula/.bun/_bun" ] && source "/home/fboukezzoula/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"

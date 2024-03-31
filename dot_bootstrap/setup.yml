@@ -12,56 +12,23 @@
       ansible.builtin.set_fact:
         remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 
+    - name: Install mise (ex rtx)
+      ansible.builtin.shell: |        
+          curl https://mise.run | sh 
+      args:
+        executable: /bin/bash
+        
+    - name: Install Development Tools
+      ansible.builtin.shell: |        
+          sudo dnf group install "Development Tools" -y
+      args:
+        executable: /bin/bash
+
     - name: Install packages
       ansible.builtin.dnf:
         name:
-          - git
-          - htop
-          - vim
-          - gh
-          - gnome-tweaks
-          - gcc
-          - helm
-          - go-task
-          - ripgrep
-          - poetry
           - zsh
-          - fzf
-          - tmux
-          - ffmpeg-free
-          - zlib
-          - zlib-devel
-          - make
-          - patch
-          - bzip2
-          - bzip2-devel
-          - readline-devel
-          - sqlite
-          - sqlite-devel
-          - openssl-devel
-          - tk-devel
-          - libffi-devel
-          - xz-devel
-          - libuuid-devel
-          - gdbm-libs
-          - libnsl2
-          - luarocks
-          - wl-clipboard
-          - fd-find
-          - gcc-c++
-          - doctl
-          - helix
-          - "@Development Tools"
-          - autoconf
-          - ncurses-devel
-          - wxGTK-devel
-          - wxBase
-          - libxslt
-          - fop
-          - inotify-tools
-          - toilet
-          - unar
-        state: present
+        state: present          
 
     - name: Change shell to zsh
       ansible.builtin.user:
@@ -76,20 +43,6 @@
     - name: Import Microsoft GPG Key
       ansible.builtin.rpm_key:
         key: https://packages.microsoft.com/keys/microsoft.asc
-        state: present
-
-    - name: Add rtx config manager
-      ansible.builtin.yum_repository:
-        name: rtx
-        description: RTX Repo
-        baseurl: https://rtx.pub/rpm
-        gpgkey: https://rtx.pub/gpg-key.pub
-        gpgcheck: true
-        enabled: true
-
-    - name: Install RTX
-      ansible.builtin.dnf:
-        name: rtx
         state: present
 
     - name: Add kubectl repo
