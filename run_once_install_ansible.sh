@@ -24,7 +24,6 @@ case "${OS}" in
             install_on_fedora
         elif [ -f /etc/os-release ]; then
             install_on_rhel
-        else            
         elif [ -f /etc/lsb-release ]; then
             install_on_ubuntu
         else
