@@ -52,7 +52,6 @@
           - doctl
           - helix
           - "@Development Tools"
-          - "@C Development Tools and Libraries"
           - autoconf
           - ncurses-devel
           - wxGTK-devel
