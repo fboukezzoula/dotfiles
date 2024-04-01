@@ -8,6 +8,7 @@
     flyctl_version: "0.1.130"
     terraform_version: "1.7.5"
     kubernetes_version: "v1.28"
+    kind_version: "v0.22.0"
 
   tasks:
     - name: Get my user
@@ -185,3 +186,18 @@
         name: podman-docker
         state: present
         
+    - name: Check if the targeted version of kind is installed
+      ansible.builtin.shell: |        
+         /usr/local/bin/kind version
+      register: installed_kind_version
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install Kind
+      ansible.builtin.shell: |        
+          [ $(uname -m) = x86_64 ] && curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/{{ kind_version }}/kind-linux-amd64 && chmod +x /usr/local/bin/kind
+      args:
+        executable: /bin/bash      
+      when: kind_version not in installed_kind_version.stdout   
+
+
