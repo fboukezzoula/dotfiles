@@ -7,23 +7,38 @@
   vars:
     flyctl_version: "0.1.130"
     terraform_version: "1.7.5"
+    kubernetes_version: "v1.28"
 
   tasks:
     - name: Get my user
       ansible.builtin.set_fact:
         remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 
+    - name: Check folder exist otherwise create it
+      ansible.builtin.file:
+        path: ~{{ remote_regular_user }}/.local/bin/
+        state: directory
+        mode: "0755"
+
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
-          curl -fsLS get.chezmoi.io -o ~/.local/bin/chezmoi && chmod +x ~/.local/bin/chezmoi
+          curl -fsLS get.chezmoi.io -o ~{{ remote_regular_user }}/.local/bin/chezmoi
       args:
-        executable: /bin/bash        
+        executable: /bin/bash
 
     - name: Install mise (ex rtx)
       ansible.builtin.shell: |        
-          curl https://mise.run | sh 
+          curl https://mise.run -o ~{{ remote_regular_user }}/.local/bin/mise
       args:
         executable: /bin/bash
+
+    - name: Set owner and permissions
+      file:
+        path: ~{{ remote_regular_user }}/.local
+        state: directory
+        recurse: yes
+        owner: "{{ remote_regular_user }}"
+        mode: "755"
         
     - name: Install Development Tools
       ansible.builtin.shell: |        
@@ -56,8 +71,8 @@
       ansible.builtin.yum_repository:
         name: Kubernetes
         description: Kubernetes repo
-        baseurl: https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
-        gpgkey: https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
+        baseurl: https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/rpm/
+        gpgkey: https://pkgs.k8s.io/core:/stable://{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
         gpgcheck: true
         enabled: true
 
@@ -68,7 +83,7 @@
 
     - name: Install Terraform
       ansible.builtin.unarchive:
-        src: https://releases.hashicorp.com/terraform/1.7.5/terraform_{{ terraform_version }}_linux_amd64.zip 
+        src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip 
         dest: /usr/local/bin
         remote_src: yes
         mode: "0755"
