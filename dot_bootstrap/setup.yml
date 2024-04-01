@@ -6,11 +6,18 @@
   gather_facts: true
   vars:
     flyctl_version: "0.1.130"
+    terraform_version: "1.7.5"
 
   tasks:
     - name: Get my user
       ansible.builtin.set_fact:
         remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
+
+    - name: Install chezmoi (manage my dotfiles)
+      ansible.builtin.shell: |        
+          curl -fsLS get.chezmoi.io -o ~/.local/bin/chezmoi && chmod +x ~/.local/bin/chezmoi
+      args:
+        executable: /bin/bash        
 
     - name: Install mise (ex rtx)
       ansible.builtin.shell: |        
@@ -59,19 +66,12 @@
         name: kubectl
         state: present
 
-    - name: Add Hashicorp Repo
-      ansible.builtin.yum_repository:
-        name: hashicorp
-        description: Hashicorp repo
-        baseurl: https://rpm.releases.hashicorp.com/fedora/$releasever/$basearch/stable
-        gpgkey: https://rpm.releases.hashicorp.com/gpg
-        gpgcheck: true
-        enabled: true
-
     - name: Install Terraform
-      ansible.builtin.dnf:
-        name: terraform
-        state: present
+      ansible.builtin.unarchive:
+        src: https://releases.hashicorp.com/terraform/1.7.5/terraform_{{ terraform_version }}_linux_amd64.zip 
+        dest: /usr/local/bin
+        remote_src: yes
+        mode: "0755"
 
     - name: Check if the targeted version of flyctl is installed
       ansible.builtin.command: flyctl version
