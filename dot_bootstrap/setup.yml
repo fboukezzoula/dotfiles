@@ -32,6 +32,12 @@
       args:
         executable: /bin/bash
 
+    - name: Install Bun
+      ansible.builtin.shell: |        
+          curl -fsSL https://bun.sh/install -o ~{{ remote_regular_user }}/.local/bin/burn
+      args:
+        executable: /bin/bash
+
     - name: Set owner and permissions
       file:
         path: ~{{ remote_regular_user }}/.local
