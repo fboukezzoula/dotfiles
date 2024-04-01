@@ -67,7 +67,6 @@
           - luarocks
           - make
           - net-tools
-          - nvim
           - patch
           - podman-compose
           - ripgrep
