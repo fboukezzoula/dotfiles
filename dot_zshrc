@@ -9,7 +9,7 @@ export PATH=$PATH:$HOME/bin
 export PATH=$PATH:$HOME/.cargo/bin
 export PATH="$HOME/.scripts/bin:$PATH"
 
-eval "$(rtx activate zsh)"
+eval "$(mise activate zsh)"
 
 alias task=go-task
 alias v=nvim
@@ -18,7 +18,7 @@ alias fly=flyctl
 
 # https://bun.sh/ 
 # bun completions
-[ -s "/home/fboukezzoula/.bun/_bun" ] && source "/home/fboukezzoula/.bun/_bun"
+[ -s "~/.bun/_bun" ] && source "~/.bun/_bun"
 
 # bun
 export BUN_INSTALL="$HOME/.bun"
