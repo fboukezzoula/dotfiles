@@ -87,12 +87,12 @@
         name: kubectl
         state: present
 
-    - name: Install Terraform
-      ansible.builtin.unarchive:
-        src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip 
-        dest: /usr/local/bin
-        remote_src: yes
-        mode: "0755"
+    # - name: Install Terraform
+    #   ansible.builtin.unarchive:
+    #     src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip 
+    #     dest: /usr/local/bin
+    #     remote_src: yes
+    #     mode: "0755"
 
     - name: Check if the targeted version of flyctl is installed
       ansible.builtin.command: flyctl version
@@ -135,3 +135,19 @@
         remote_src: true
         mode: "0755"
         owner: "{{ remote_regular_user }}"
+
+    - name: Install container-tools
+      ansible.builtin.dnf:
+        name: container-tools
+        state: present
+
+    - name: Install podman-plugins
+      ansible.builtin.dnf:
+        name: podman-plugins
+        state: present
+
+    - name: Install podman-docker
+      ansible.builtin.dnf:
+        name: podman-docker
+        state: present
+        
