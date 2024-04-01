@@ -49,8 +49,27 @@
     - name: Install packages
       ansible.builtin.dnf:
         name:
+          - cockpit # web console admin on rhel (port 9090 per default)
+          - dotnet-sdk-8.0
+          - fd-find
+          - fzf
+          - git
+          - helix
+          - htop
+          - iproute
+          - iptables
+          - luarocks
+          - make
+          - net-tools
+          - patch
+          - podman-compose
+          - ripgrep
+          - tmux
+          - toilet
+          - unar
+          - vim
+          - wl-clipboard
           - zsh
-          - cockpit
         state: present         
 
     - name: Make sure cockpit is running
@@ -87,15 +106,24 @@
         name: kubectl
         state: present
 
-    # - name: Install Terraform
-    #   ansible.builtin.unarchive:
-    #     src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip 
-    #     dest: /usr/local/bin
-    #     remote_src: yes
-    #     mode: "0755"
+    - name: Check if the targeted version of terraform is installed
+      ansible.builtin.shell: |        
+          /usr/local/bin/terraform version
+      register: installed_terraform_version
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install Terraform
+      ansible.builtin.unarchive:
+        src: https://releases.hashicorp.com/terraform/{{ terraform_version }}/terraform_{{ terraform_version }}_linux_amd64.zip 
+        dest: /usr/local/bin
+        remote_src: yes
+        mode: "0755"
+      when: terraform_version not in installed_terraform_version.stdout  
 
     - name: Check if the targeted version of flyctl is installed
-      ansible.builtin.command: flyctl version
+      ansible.builtin.shell: |        
+          /usr/local/bin/flyctl version
       register: installed_flyctl_version
       ignore_errors: true
       changed_when: false
