@@ -29,6 +29,12 @@
         state: directory
         mode: "0700"        
 
+    - name: Enable snapd on RHEL9
+      ansible.builtin.shell: sh -c snapd_install.sh >> snapd_install.txt
+      args:
+        chdir: "~{{ remote_regular_user }}/.local/scripts"
+        creates: snapd_install.txt 
+
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
           curl -fsLS get.chezmoi.io -o ~{{ remote_regular_user }}/.local/bin/chezmoi
@@ -96,7 +102,12 @@
           - vim
           - wl-clipboard
           - zsh
-        state: present         
+        state: present   
+
+    - name: Install nvim with option --classic
+      snap:
+        name: nvim
+        classic: yes 
 
     - name: Make sure cockpit is running
       ansible.builtin.systemd_service:
@@ -233,12 +244,6 @@
         gpgkey: https://pkgs.k8s.io/core:/stable://{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
         gpgcheck: true
         enabled: true 
-
-    - name: Enable snaps on RHEL9
-      ansible.builtin.shell: sh -c helm_install.sh helm_install.sh >> helm_install.txt
-      args:
-        chdir: "~{{ remote_regular_user }}/.local/scripts"
-        creates: helm_install.txt 
 
     - name: Check if the targeted version of Helm is installed
       ansible.builtin.shell: |        
