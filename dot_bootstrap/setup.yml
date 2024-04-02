@@ -31,7 +31,7 @@
         mode: "0700"        
 
     - name: Enable snapd on RHEL9
-      ansible.builtin.shell: snapd_install.sh >> snapd_install.txt
+      ansible.builtin.shell: snapd_install.sh > snapd_install.txt
       args:
         chdir: ~{{ remote_regular_user }}/.local/scripts/
         creates: snapd_install.txt   
@@ -68,7 +68,7 @@
       changed_when: false 
 
     - name: Install Bun
-      ansible.builtin.shell: bun_install.sh >> bun_install.txt
+      ansible.builtin.shell: bun_install.sh > bun_install.txt
       args:
         chdir: ~{{ remote_regular_user }}/.local/scripts/
         creates: bun_install.txt   
