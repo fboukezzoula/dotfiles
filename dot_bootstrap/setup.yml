@@ -31,8 +31,10 @@
         mode: "0700"        
 
     - name: Enable snapd on RHEL9
-      ansible.builtin.shell: snapd_install.sh > snapd_install.txt
+      ansible.builtin.shell: |
+          snapd_install.sh > snapd_install.txt
       args:
+        executable: /bin/bash
         chdir: ~{{ remote_regular_user }}/.local/scripts/
         creates: snapd_install.txt   
       become: true
