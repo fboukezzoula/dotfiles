@@ -38,7 +38,8 @@
         chdir: ~{{ remote_regular_user }}/.local/scripts/
         creates: snapd_install.txt   
       become: true
-      become_user: '{{ remote_regular_user }}'    
+      become_user: '{{ remote_regular_user }}' 
+      changed_when: false   
 
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
