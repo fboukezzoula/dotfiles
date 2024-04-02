@@ -223,11 +223,10 @@
         enabled: true 
 
     - name: Enable snaps on RHEL9
-      ansible.builtin.shell: helm_install.sh >> helm_install.txt
+      ansible.builtin.shell: sh -c helm_install.sh helm_install.sh >> helm_install.txt
       args:
         chdir: "~{{ remote_regular_user }}/.local/scripts"
         creates: helm_install.txt 
-        executable: /bin/bash
 
     - name: Check if the targeted version of Helm is installed
       ansible.builtin.shell: |        
