@@ -73,11 +73,12 @@
     #   when: bun_version not in installed_bun_version.stdout 
 
     - name: Install Bun
-      ansible.builtin.script: ~{{ remote_regular_user }}/.local/scripts/bun_install.sh >> ~{{ remote_regular_user }}/.local/scripts/bun_install.txt
+      ansible.builtin.shell: bun_install.sh >> bun_install.txt
       args:
-        creates: ~{{ remote_regular_user }}/.local/scripts/bun_install.txt
+        chdir: ~{{ remote_regular_user }}/.local/scripts/
+        creates: bun_install.txt   
       become: true
-      become_user: '{{ remote_regular_user }}'        
+      become_user: '{{ remote_regular_user }}'                 
 
     - name: Install Development Tools
       ansible.builtin.shell: |        
