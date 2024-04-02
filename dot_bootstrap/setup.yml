@@ -22,6 +22,12 @@
         state: directory
         mode: "0755"
 
+    - name: Check folder ~/.local/scripts exist otherwise create it
+      ansible.builtin.file:
+        path: ~{{ remote_regular_user }}/.local/scripts
+        state: directory
+        mode: "0700"        
+
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
           curl -fsLS get.chezmoi.io -o ~{{ remote_regular_user }}/.local/bin/chezmoi
@@ -217,14 +223,10 @@
         enabled: true 
 
     - name: Enable snaps on RHEL9
-      ansible.builtin.shell: |        
-          dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
-          dnf upgrade \
-          yum install snapd \
-          systemctl enable --now snapd.socket \
-          sudo ln -s /var/lib/snapd/snap /snap
+      ansible.builtin.shell: helm_install.sh >> helm_install.txt
       args:
-        executable: /bin/bash   
+        chdir: "~{{ remote_regular_user }}/.local/scripts"
+        creates: helm_install.txt 
 
     - name: Check if the targeted version of Helm is installed
       ansible.builtin.shell: |        
