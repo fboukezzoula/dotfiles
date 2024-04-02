@@ -34,12 +34,14 @@
           curl -fsLS get.chezmoi.io -o ~{{ remote_regular_user }}/.local/bin/chezmoi
       args:
         executable: /bin/bash
+      owner: "{{ remote_regular_user }}"  
 
     - name: Install mise (ex rtx)
       ansible.builtin.shell: |        
           curl https://mise.run -o ~{{ remote_regular_user }}/.local/bin/mise
       args:
         executable: /bin/bash
+      owner: "{{ remote_regular_user }}"  
 
     - name: Check if the targeted version of bun is installed
       become: true
