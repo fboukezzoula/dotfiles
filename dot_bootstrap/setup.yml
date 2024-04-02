@@ -34,6 +34,8 @@
       ansible.builtin.shell: sh -c snapd_install.sh 
       args:
         chdir: "~{{ remote_regular_user }}/.local/scripts"
+      ignore_errors: true
+      changed_when: false
 
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
