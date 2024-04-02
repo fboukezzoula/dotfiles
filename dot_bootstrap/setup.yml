@@ -31,10 +31,12 @@
         mode: "0700"        
 
     - name: Enable snapd on RHEL9
-      ansible.builtin.script: ~{{ remote_regular_user }}/.local/scripts/snapd_install.sh >> ~{{ remote_regular_user }}/.local/scripts/snapd_install.txt
+      ansible.builtin.shell: snapd_install.sh >> snapd_install.txt
       args:
-        creates: ~{{ remote_regular_user }}/.local/scripts/snapd_install.txt
-          
+        chdir: ~{{ remote_regular_user }}/.local/scripts/
+        creates: snapd_install.txt   
+      become: true
+      become_user: '{{ remote_regular_user }}'    
 
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
@@ -64,13 +66,6 @@
       register: installed_bun_version
       ignore_errors: true
       changed_when: false 
-
-    # - name: Install Bun
-    #   ansible.builtin.shell: |        
-    #       curl -fsSL https://bun.sh/install | bash
-    #   become: true
-    #   become_user: '{{ remote_regular_user }}'
-    #   when: bun_version not in installed_bun_version.stdout 
 
     - name: Install Bun
       ansible.builtin.shell: bun_install.sh >> bun_install.txt
