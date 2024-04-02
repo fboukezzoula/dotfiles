@@ -9,13 +9,14 @@
     terraform_version: "1.7.5"
     kubernetes_version: "v1.28"
     kind_version: "v0.22.0"
+    helm_version: "v3.14.3"
 
   tasks:
     - name: Get my user
       ansible.builtin.set_fact:
         remote_regular_user: "{{ ansible_env.SUDO_USER or ansible_user_id }}"
 
-    - name: Check folder exist otherwise create it
+    - name: Check folder ~/.local/bin exist otherwise create it
       ansible.builtin.file:
         path: ~{{ remote_regular_user }}/.local/bin/
         state: directory
@@ -97,20 +98,6 @@
     - name: Import Microsoft GPG Key
       ansible.builtin.rpm_key:
         key: https://packages.microsoft.com/keys/microsoft.asc
-        state: present
-
-    - name: Add kubectl repo
-      ansible.builtin.yum_repository:
-        name: Kubernetes
-        description: Kubernetes repo
-        baseurl: https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/rpm/
-        gpgkey: https://pkgs.k8s.io/core:/stable://{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
-        gpgcheck: true
-        enabled: true
-
-    - name: Install kubectl
-      ansible.builtin.dnf:
-        name: kubectl
         state: present
 
     - name: Check if the targeted version of terraform is installed
@@ -200,4 +187,56 @@
         executable: /bin/bash      
       when: kind_version not in installed_kind_version.stdout   
 
+    - name: Check folder /etc/opt/kind exist otherwise create it
+      ansible.builtin.file:
+        path: /etc/opt/kind
+        state: directory
+        mode: "0700"
 
+    - name: Add kubectl repo
+      ansible.builtin.yum_repository:
+        name: Kubernetes
+        description: Kubernetes repo
+        baseurl: https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/rpm/
+        gpgkey: https://pkgs.k8s.io/core:/stable://{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
+        gpgcheck: true
+        enabled: true
+
+    - name: Install kubectl
+      ansible.builtin.dnf:
+        name: kubectl
+        state: present
+
+    - name: Add kubectl repo
+      ansible.builtin.yum_repository:
+        name: Kubernetes
+        description: Kubernetes repo
+        baseurl: https://pkgs.k8s.io/core:/stable:/{{ kubernetes_version }}/rpm/
+        gpgkey: https://pkgs.k8s.io/core:/stable://{{ kubernetes_version }}/rpm/repodata/repomd.xml.key
+        gpgcheck: true
+        enabled: true 
+
+    - name: Enable snaps on RHEL9
+      ansible.builtin.shell: |        
+          dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
+          dnf upgrade \
+          yum install snapd \
+          systemctl enable --now snapd.socket \
+          sudo ln -s /var/lib/snapd/snap /snap
+      args:
+        executable: /bin/bash   
+
+    - name: Check if the targeted version of Helm is installed
+      ansible.builtin.shell: |        
+         /var/lib/snapd/snap/bin/helm version
+      register: installed_helm_version
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install Helm with option --classic
+      snap:
+        name: helm
+        classic: yes   
+      when: helm_version not in installed_helm_version.stdout                 
+
+              
