@@ -40,7 +40,6 @@
           curl https://mise.run -o ~{{ remote_regular_user }}/.local/bin/mise
       args:
         executable: /bin/bash
-      owner: "{{ remote_regular_user }}"  
 
     - name: Check if the targeted version of bun is installed
       become: true
