@@ -11,6 +11,7 @@
     kind_version: "v0.22.0"
     helm_version: "v3.14.3"
     bun_version: "v1.1.0" 
+    nvim_version: "v0.9.4"
 
   tasks:
     - name: Get my user
@@ -30,10 +31,9 @@
         mode: "0700"        
 
     - name: Enable snapd on RHEL9
-      ansible.builtin.shell: sh -c snapd_install.sh >> snapd_install.txt
+      ansible.builtin.shell: sh -c snapd_install.sh 
       args:
         chdir: "~{{ remote_regular_user }}/.local/scripts"
-        creates: snapd_install.txt 
 
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
@@ -46,6 +46,14 @@
           curl https://mise.run -o ~{{ remote_regular_user }}/.local/bin/mise
       args:
         executable: /bin/bash
+
+    - name: Set owner and permissions
+      file:
+        path: ~{{ remote_regular_user }}/.local
+        state: directory
+        recurse: yes
+        owner: "{{ remote_regular_user }}"
+        mode: "755"        
 
     - name: Check if the targeted version of bun is installed
       become: true
@@ -63,14 +71,6 @@
       become_user: '{{ remote_regular_user }}'
       when: bun_version not in installed_bun_version.stdout 
 
-    - name: Set owner and permissions
-      file:
-        path: ~{{ remote_regular_user }}/.local
-        state: directory
-        recurse: yes
-        owner: "{{ remote_regular_user }}"
-        mode: "755"
-        
     - name: Install Development Tools
       ansible.builtin.shell: |        
           sudo dnf group install "Development Tools" -y
@@ -104,10 +104,18 @@
           - zsh
         state: present   
 
+    - name: Check if the targeted version of nvim is installed
+      ansible.builtin.shell: |        
+         /var/lib/snapd/snap/bin/nvim --version
+      register: installed_nvim_version
+      ignore_errors: true
+      changed_when: false
+
     - name: Install nvim with option --classic
       snap:
         name: nvim
         classic: yes 
+      when: nvim_version not in installed_nvim_version.stdout          
 
     - name: Make sure cockpit is running
       ansible.builtin.systemd_service:
