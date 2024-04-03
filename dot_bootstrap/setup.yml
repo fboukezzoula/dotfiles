@@ -37,7 +37,6 @@
         executable: /bin/bash
         chdir: ~/.local/scripts/
         creates: snapd_install.txt   
-      become: true
       become_user: '{{ remote_regular_user }}' 
 
     - name: Install chezmoi (manage my dotfiles)
