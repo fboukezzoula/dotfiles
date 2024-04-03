@@ -31,13 +31,14 @@
         mode: "0755"        
 
     - name: Enable snapd on RHEL9
+      become: true
+      become_user: '{{ remote_regular_user }}'     
       ansible.builtin.shell: |
-         ~/.local/scripts/snapd_install.sh  > snapd_install.txt
+         ~{{ remote_regular_user }}/.local/scripts/snapd_install.sh  > snapd_install.txt
       args:
         executable: /bin/bash
-        chdir: ~/.local/scripts/
-        creates: snapd_install.txt   
-      become_user: '{{ remote_regular_user }}' 
+        chdir: ~{{ remote_regular_user }}/.local/scripts/
+        creates: snapd_install.txt               
 
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
@@ -69,13 +70,13 @@
       changed_when: false 
 
     - name: Install Bun
+      become: true
+      become_user: '{{ remote_regular_user }}'     
       ansible.builtin.shell: |
           ~{{ remote_regular_user }}/.local/scripts/bun_install.sh > bun_install.txt
       args:
         chdir: ~{{ remote_regular_user }}/.local/scripts/
-        creates: bun_install.txt   
-      become: true
-      become_user: '{{ remote_regular_user }}'                 
+        creates: bun_install.txt                  
 
     - name: Install Development Tools
       ansible.builtin.shell: |        
@@ -127,11 +128,6 @@
       ansible.builtin.systemd_service:
         state: started
         name: cockpit.socket  
-
-    - name: Change shell to zsh
-      ansible.builtin.user:
-        name: "{{ remote_regular_user }}"
-        shell: /usr/bin/zsh
 
     - name: Install DNF plugins core
       ansible.builtin.dnf:
@@ -270,6 +266,10 @@
       snap:
         name: helm
         classic: yes   
-      when: helm_version not in installed_helm_version.stdout                 
+      when: helm_version not in installed_helm_version.stdout  
 
-              
+    - name: Change shell to zsh
+      ansible.builtin.user:
+        name: "{{ remote_regular_user }}"
+        shell: /usr/bin/zsh   
+                  
