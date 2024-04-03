@@ -32,10 +32,10 @@
 
     - name: Enable snapd on RHEL9
       ansible.builtin.shell: |
-         ~{{ remote_regular_user }}/.local/scripts/snapd_install.sh  > snapd_install.txt
+         ~/.local/scripts/snapd_install.sh  > snapd_install.txt
       args:
         executable: /bin/bash
-        chdir: ~{{ remote_regular_user }}/.local/scripts/
+        chdir: ~/.local/scripts/
         creates: snapd_install.txt   
       become: true
       become_user: '{{ remote_regular_user }}' 
