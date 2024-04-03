@@ -28,7 +28,7 @@
       ansible.builtin.file:
         path: ~{{ remote_regular_user }}/.local/scripts
         state: directory
-        mode: "0700"        
+        mode: "0755"        
 
     - name: Enable snapd on RHEL9
       ansible.builtin.shell: |
@@ -39,7 +39,6 @@
         creates: snapd_install.txt   
       become: true
       become_user: '{{ remote_regular_user }}' 
-      changed_when: false   
 
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
