@@ -213,6 +213,12 @@
       ansible.builtin.dnf:
         name: podman-docker
         state: present
+
+    - name: Touch a file, remove message "Emulate Docker CLI using podman"
+      ansible.builtin.file:
+        path: /etc/containers/nodocker
+        state: touch
+       
         
     - name: Check if the targeted version of kind is installed
       ansible.builtin.shell: |        
