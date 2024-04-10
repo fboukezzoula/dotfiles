@@ -109,6 +109,8 @@
           - vim
           - wl-clipboard
           - zsh
+          - zsh-autosuggestions
+          - zsh-syntax-highlighting
         state: present   
 
     - name: Check if the targeted version of nvim is installed
