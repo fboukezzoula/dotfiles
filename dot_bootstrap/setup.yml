@@ -12,6 +12,7 @@
     helm_version: "v3.14.3"
     bun_version: "v1.1.0" 
     nvim_version: "v0.9.4"
+    gh_version: "2.6.0-15"
 
   tasks:
     - name: Get my user
@@ -30,16 +31,6 @@
         state: directory
         mode: "0755"        
 
-    - name: Enable snapd on RHEL9
-      become: true
-      become_user: '{{ remote_regular_user }}'     
-      ansible.builtin.shell: |
-         ~{{ remote_regular_user }}/.local/scripts/snapd_install.sh  > snapd_install.txt
-      args:
-        executable: /bin/bash
-        chdir: ~{{ remote_regular_user }}/.local/scripts/
-        creates: snapd_install.txt               
-
     - name: Install chezmoi (manage my dotfiles)
       ansible.builtin.shell: |        
           curl -fsLS get.chezmoi.io -o ~{{ remote_regular_user }}/.local/bin/chezmoi
@@ -51,6 +42,16 @@
           curl https://mise.run -o ~{{ remote_regular_user }}/.local/bin/mise
       args:
         executable: /bin/bash
+
+    - name: Enable snapd on RHEL9
+      become: true
+      #become_user: '{{ remote_regular_user }}'     
+      ansible.builtin.shell: |
+         ~{{ remote_regular_user }}/.local/scripts/snapd_install.sh  > snapd_install.txt
+      args:
+        executable: /bin/bash
+        chdir: ~{{ remote_regular_user }}/.local/scripts/
+        creates: snapd_install.txt               
 
     - name: Set owner and permissions
       file:
@@ -124,7 +125,20 @@
       snap:
         name: nvim
         classic: yes 
-      when: nvim_version not in installed_nvim_version.stdout          
+      when: nvim_version not in installed_nvim_version.stdout        
+
+    - name: Check if the targeted version of gh is installed
+      ansible.builtin.shell: |        
+         /var/lib/snapd/snap/bin/gh --version
+      register: installed_gh_version
+      ignore_errors: true
+      changed_when: false
+
+    - name: Install gh with option --classic
+      snap:
+        name: gh
+        classic: yes 
+      when: gh_version not in installed_gh_version.stdout         
 
     - name: Make sure cockpit is running
       ansible.builtin.systemd_service:
