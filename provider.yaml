@@ -1,0 +1,81 @@
+name: ssh
+version: v0.0.15
+description: |-
+  DevPod on SSH
+icon: https://devpod.sh/assets/ssh.svg
+iconDark: https://devpod.sh/assets/ssh_dark.svg
+optionGroups:
+  - options:
+      - PORT
+      - EXTRA_FLAGS
+      - USE_BUILTIN_SSH
+    name: "SSH options"
+    defaultVisible: false
+  - options:
+      - DOCKER_PATH
+      - AGENT_PATH
+      - INACTIVITY_TIMEOUT
+      - INJECT_DOCKER_CREDENTIALS
+      - INJECT_GIT_CREDENTIALS
+    name: "Agent options"
+    defaultVisible: false
+options:
+  INACTIVITY_TIMEOUT:
+    description: "If defined, will automatically stop the container after the inactivity period. Example: 10m"
+  DOCKER_PATH:
+    description: The path where to find the docker binary.
+    default: docker
+  AGENT_PATH:
+    description: The path where to inject the DevPod agent to.
+    command: printf "%s" "/tmp/${USER}/devpod/agent"
+  INJECT_GIT_CREDENTIALS:
+    description: "If DevPod should inject git credentials into the remote host."
+    default: "true"
+  INJECT_DOCKER_CREDENTIALS:
+    description: "If DevPod should inject docker credentials into the remote host."
+    default: "true"
+  HOST:
+    required: true
+    description: "The SSH Host to connect to. Example: my-user@my-domain.com"
+  PORT:
+    description: "The SSH Port to use. Defaults to 22"
+    default: "22"
+  EXTRA_FLAGS:
+    description: "Extra flags to pass to the SSH command."
+  USE_BUILTIN_SSH:
+    description: "Use the builtin SSH package."
+    default: false
+    type: boolean
+agent:
+  inactivityTimeout: ${INACTIVITY_TIMEOUT}
+  injectGitCredentials: ${INJECT_GIT_CREDENTIALS}
+  injectDockerCredentials: ${INJECT_DOCKER_CREDENTIALS}
+  path: ${AGENT_PATH}
+  docker:
+    path: ${DOCKER_PATH}
+    install: false
+binaries:
+  SSH_PROVIDER:
+    - os: linux
+      arch: amd64
+      path: https://github.com/loft-sh/devpod-provider-ssh/releases/download/v0.0.15/devpod-provider-ssh-linux-amd64
+      checksum: 30922c0c45b65c799405e7733913c507d73e20badff2b5fb67f8388c5bb8b69d
+    - os: linux
+      arch: arm64
+      path: https://github.com/loft-sh/devpod-provider-ssh/releases/download/v0.0.15/devpod-provider-ssh-linux-arm64
+      checksum: 7332beb14d8c29a4c6934d2eaf9a37b4813c8f7222615a8bba0a8c36bf9c3fa2
+    - os: darwin
+      arch: amd64
+      path: https://github.com/loft-sh/devpod-provider-ssh/releases/download/v0.0.15/devpod-provider-ssh-darwin-amd64
+      checksum: 09c0bed799904cddc58fcb3e822fb36b4bdf971fa0438153bf89d89add7ae08d
+    - os: darwin
+      arch: arm64
+      path: https://github.com/loft-sh/devpod-provider-ssh/releases/download/v0.0.15/devpod-provider-ssh-darwin-arm64
+      checksum: a6bedc6e0b96254857e4f6974eaeec07f4e221a753c162be3198778445687e66
+    - os: windows
+      arch: amd64
+      path: https://github.com/loft-sh/devpod-provider-ssh/releases/download/v0.0.15/devpod-provider-ssh-windows-amd64.exe
+      checksum: dcfabd63215df9ef477b41f690e8ca559b541d49a0e189b0254b5da9d4d47467
+exec:
+  init: ${SSH_PROVIDER} init
+  command: ${SSH_PROVIDER} command
